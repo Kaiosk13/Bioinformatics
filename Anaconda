@@ -1,1 +1,35 @@
+# Run the spyder
+# Open the py documents
+#1. 把待爬資料與.py檔放在同一資料夾，產出檔案會存在該資料夾中。
+#2. 下列黃色標註者分別是匯入檔案名、產出檔案名、與待查序號欄位名，可自行修改。
 
+import csv
+import requests, bs4
+import random, time
+
+headers = { 'User-Agent':'Mozilla/5.0 (Window NT 6.1; WOW64)\
+						AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101\
+						Safari/537.35', }
+url = 'http://www.boldsystems.org/index.php/Public_recordView?processid='
+
+inFile = '待爬資料.csv'
+outFile = 'outFile1.csv'
+
+startTime = int(time.time())
+
+with open(outFile, 'w', newline = '') as csvOutFile: 
+		csvWriter = csv.writer(csvOutFile)
+		csvWriter.writerow(['processid', 'Phylum', 'Class', 'Order', 'Family', 'SubFamily',
+												'Genus', 'Species', 'SubSpecies', 'Species', 'BIN ID',
+												'GeneBank Accession'])
+		pg = 1
+		with open(inFile) as csvInFile:
+				csvDicReader = csvDicReader(csvInFile)
+				for row in csvDicReader:
+				htmlfile = requests.get(url+row['no'], headers=headers)
+				print(pg)
+
+				if htmlfile.status_code == requests.codes.ok:
+
+						objSoup = bs4.BeautifulSoup(html.text, 'lxml')
+						objTag = objSoup.find_all('td')
