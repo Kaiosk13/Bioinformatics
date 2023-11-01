@@ -20,8 +20,8 @@ startTime = int(time.time())
 with open(outFile, 'w', newline = '') as csvOutFile: 
 		csvWriter = csv.writer(csvOutFile)
 		csvWriter.writerow(['processid', 'Phylum', 'Class', 'Order', 'Family', 'SubFamily',
-												'Genus', 'Species', 'SubSpecies', 'Species', 'BIN ID',
-												'GeneBank Accession'])
+		'Genus', 'Species', 'SubSpecies', 'Species', 'BIN ID',
+		'GeneBank Accession'])
 		pg = 1
 		with open(inFile) as csvInFile:
 				csvDicReader = csvDicReader(csvInFile)
@@ -33,3 +33,79 @@ with open(outFile, 'w', newline = '') as csvOutFile:
 
 						objSoup = bs4.BeautifulSoup(html.text, 'lxml')
 						objTag = objSoup.find_all('td')
+
+
+import csv
+import requests, bs4
+import random, time
+
+headers = { 'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64)\
+            AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101\
+            Safari/537.36', }
+url = 'http://www.boldsystems.org/index.php/Public_RecordView?processid='
+
+inFile = '待爬資料.csv'
+outFile = 'outFile7.csv'
+
+startTime=int(time.time())
+
+with open(outFile, 'w', newline = '') as csvOutFile:    # 開啟csv檔案
+    csvWriter = csv.writer(csvOutFile)             # 建立Writer物件   
+    csvWriter.writerow(['processid', 'Phylum', 'Class', 'Order', 'Family', 'Subfamily', 'Genus', 'Species', 'Subspecies', 'BIN ID', 'GenBank Accession'])
+
+    pg=1
+    with open(inFile) as csvInFile:                   # 開啟csv檔案
+        csvDictReader = csv.DictReader(csvInFile) # 讀檔案建立DictReader物件   
+        for row in csvDictReader:               # 使用迴圈列出字典內容
+            htmlfile = requests.get(url+row['no'], headers=headers)
+            print(pg)
+
+            if htmlfile.status_code == requests.codes.ok:
+                #print(row['no'])
+                objSoup = bs4.BeautifulSoup(htmlfile.text, 'lxml')
+                objTag = objSoup.find_all('td')
+                
+                for i in range(len(objTag)):
+                    #print(i)
+                    # print(objTag[i].getText())
+                    if (objTag[i].getText()=='Phylum:'):
+                        Phylum=objTag[i+1].getText()
+                        continue
+                    if (objTag[i].getText()=='Subfamily:'):
+                        Subfamily=objTag[i+1].getText()
+                        continue
+                    if (objTag[i].getText()=='Class:'):
+                        Class=objTag[i+1].getText()
+                        continue
+                    if (objTag[i].getText()=='Genus:'):
+                        Genus=objTag[i+1].getText()
+                        continue
+                    if (objTag[i].getText()=='Order:'):
+                        Order=objTag[i+1].getText()
+                        continue
+                    if (objTag[i].getText()=='Species:'):
+                        Species=objTag[i+1].getText()
+                        continue
+                    if (objTag[i].getText()=='Family:'):
+                        Family=objTag[i+1].getText()
+                        continue
+                    if (objTag[i].getText()=='Subspecies:'):
+                        Subspecies=objTag[i+1].getText()
+                        continue
+                    if (objTag[i].getText()=='BIN ID:'):
+                        BIN_ID=objTag[i+1].getText()
+                        continue
+                    if (objTag[i].getText()=='GenBank Accession:'):
+                        GenBankAccession=objTag[i+1].getText()
+                        break
+                
+                csvWriter.writerow([row['no'], Phylum, Class, Order, Family, Subfamily, Genus, Species, Subspecies, BIN_ID.strip(), GenBankAccession])
+
+            else:
+                print(row['no']+"取得網頁內容失敗")
+            #if (pg%100==0):
+            #    time.sleep(random.randint(5,10))
+            pg=pg+1
+
+endTime=int(time.time())
+print("總共"+str(endTime-startTime)+"秒")
