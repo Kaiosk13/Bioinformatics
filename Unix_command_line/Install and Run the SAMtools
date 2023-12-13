@@ -1,1 +1,13 @@
+Install SAMtools by Anaconda
+% conda config --add channels bioconda
+% conda config --add channels conda-forge
+% conda create -n samtools samtools
 
+# Checking the environment of conda
+% conda env list
+
+# Activate SAMtools
+#% conda activate samtools
+
+# deactivate SAMtools
+#% conda deactivate samtools
